@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Premium Adult Platform</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{background:#111;color:white;font-family:Arial}
+.box{background:#222;padding:20px;margin:15px;border-radius:8px}
+input,button{padding:10px;margin:5px;border:none;border-radius:5px}
+button{background:#ff0055;color:white;cursor:pointer}
+#preview img,#preview video{max-width:300px;margin-top:10px}
+.hidden{display:none}
+</style>
+</head>
+
+<body>
+
+<h2 align="center">🔥 Premium Adult Platform</h2>
+
+<!-- LOGIN -->
+<div class="box">
+<h3>Login</h3>
+<input id="email" placeholder="Email">
+<input id="pass" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+</div>
+
+<!-- UPLOAD -->
+<div class="box hidden" id="uploadBox">
+<h3>Upload Image / Video</h3>
+<input type="file" id="file">
+<button onclick="upload()">Upload</button>
+<div id="preview"></div>
+</div>
+
+<!-- ADMIN -->
+<div class="box hidden" id="adminBox">
+<h3>Admin Panel</h3>
+<button onclick="loadAdmin()">Load Admin Data</button>
+<p id="adminData"></p>
+</div>
+
+<!-- PAYMENT -->
+<div class="box">
+<h3>Paid Content</h3>
+<button onclick="pay()">Buy Premium (₹499)</button>
+</div>
+
+<script>
+let token=""
+
+/* LOGIN */
+function login(){
+ fetch("https://your-backend.com/login",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({
+   email:email.value,
+   password:pass.value
+  })
+ })
+ .then(r=>r.text())
+ .then(t=>{
+  token=t
+  localStorage.token=t
+  uploadBox.classList.remove("hidden")
+  adminBox.classList.remove("hidden")
+  alert("Login success")
+ })
+}
+
+/* UPLOAD */
+function upload(){
+ let f=file.files[0]
+ let fd=new FormData()
+ fd.append("file",f)
+
+ fetch("https://your-backend.com/upload",{
+  method:"POST",
+  headers:{Authorization:token},
+  body:fd
+ })
+ .then(r=>r.json())
+ .then(d=>{
+  if(f.type.startsWith("image")){
+   preview.innerHTML=`<img src="${URL.createObjectURL(f)}">`
+  }else{
+   preview.innerHTML=`<video controls src="${URL.createObjectURL(f)}"></video>`
+  }
+  alert("Uploaded to cloud")
+ })
+}
+
+/* ADMIN */
+function loadAdmin(){
+ fetch("https://your-backend.com/admin",{
+  headers:{Authorization:token}
+ })
+ .then(r=>r.text())
+ .then(d=>adminData.innerText=d)
+}
+
+/* PAYMENT */
+function pay(){
+ fetch("https://your-backend.com/pay")
+ .then(r=>r.text())
+ .then(url=>window.location=url)
+}
+</script>
+
+</body>
+</html>
